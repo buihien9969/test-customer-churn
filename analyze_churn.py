@@ -4,103 +4,137 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 
-# Đọc dữ liệu
+# Import necessary libraries for data analysis
+# pandas: For data manipulation and analysis
+# numpy: For numerical operations
+# matplotlib and seaborn: For data visualization
+# scipy.stats: For statistical tests and calculations
+
+# Load the training and testing datasets from CSV files
+# The data is split 80/20 for training and testing
 df_train = pd.read_csv('Copy of churn-bigml-80.csv')
 df_test = pd.read_csv('Copy of churn-bigml-20.csv')
 
-# Kết hợp dữ liệu để phân tích
+# Combine both datasets for comprehensive analysis
+# axis=0 means we're stacking the dataframes vertically (row-wise)
 df = pd.concat([df_train, df_test], axis=0)
 
-# Kiểm tra giá trị trong cột Churn
-print("Các giá trị duy nhất trong cột Churn:")
+# Check unique values in the Churn column to understand its format
+# This helps confirm the data type and possible values
+print("Unique values in the Churn column:")
 print(df['Churn'].unique())
 
-# Chuyển đổi cột Churn thành dạng số (0/1)
+# Convert the Churn column from boolean to numeric (0/1)
+# This makes it easier to perform calculations and analysis
 df['Churn'] = df['Churn'].map({False: 0, True: 1})
 
-# Hiển thị thông tin cơ bản về dữ liệu
-print("Thông tin cơ bản về dữ liệu:")
-print(f"Số lượng mẫu: {df.shape[0]}")
-print(f"Số lượng thuộc tính: {df.shape[1]}")
-print("\nCác cột trong dữ liệu:")
+# Display basic information about the dataset
+# This provides an overview of the data size and structure
+print("Basic information about the dataset:")
+print(f"Number of samples: {df.shape[0]}")  # Number of rows (samples)
+print(f"Number of features: {df.shape[1]}")  # Number of columns (features)
+print("\nColumns in the dataset:")  # List all column names
 print(df.columns.tolist())
 
-# Kiểm tra giá trị null
-print("\nKiểm tra giá trị null:")
-print(df.isnull().sum())
+# Check for missing values in the dataset
+# Missing values can affect analysis and need to be handled
+print("\nChecking for null values:")
+print(df.isnull().sum())  # Count null values in each column
 
-# Thống kê mô tả
-print("\nThống kê mô tả:")
+# Generate descriptive statistics for the dataset
+# This provides statistical measures like mean, std, min, max for each numeric column
+print("\nDescriptive statistics:")
 print(df.describe())
 
-# Phân tích tỷ lệ churn
-churn_count = df['Churn'].value_counts()
-churn_percentage = df['Churn'].value_counts(normalize=True) * 100
-print("\nPhân bố khách hàng rời bỏ:")
-print(f"Không rời bỏ (0): {churn_count[0]} ({churn_percentage[0]:.2f}%)")
-print(f"Rời bỏ (1): {churn_count[1]} ({churn_percentage[1]:.2f}%)")
+# Analyze churn distribution
+# Calculate counts and percentages of churned vs non-churned customers
+churn_count = df['Churn'].value_counts()  # Count of each churn value (0 or 1)
+churn_percentage = df['Churn'].value_counts(normalize=True) * 100  # Convert to percentages
+print("\nChurn distribution:")
+print(f"Non-churned (0): {churn_count[0]} ({churn_percentage[0]:.2f}%)")  # Non-churned customers
+print(f"Churned (1): {churn_count[1]} ({churn_percentage[1]:.2f}%)")  # Churned customers
 
-# Phân tích đặc điểm của từng nhóm khách hàng
-print("\nĐặc điểm của khách hàng không rời bỏ (Churn = 0):")
+# Analyze characteristics of each customer group
+# Generate descriptive statistics for non-churned customers
+print("\nCharacteristics of non-churned customers (Churn = 0):")
 print(df[df['Churn'] == 0].describe())
 
-print("\nĐặc điểm của khách hàng rời bỏ (Churn = 1):")
+# Generate descriptive statistics for churned customers
+print("\nCharacteristics of churned customers (Churn = 1):")
 print(df[df['Churn'] == 1].describe())
 
-# So sánh các đặc điểm giữa hai nhóm
-print("\nSo sánh các đặc điểm giữa hai nhóm:")
+# Compare features between churned and non-churned groups
+# This helps identify which factors might influence customer churn
+print("\nComparing features between the two groups:")
+# Get all numerical columns except the Churn column
 numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-numerical_cols.remove('Churn')  # Loại bỏ cột Churn khỏi danh sách
+numerical_cols.remove('Churn')  # Remove the Churn column from the list
 
+# For each numerical feature, compare means between churned and non-churned groups
 for col in numerical_cols:
+    # Calculate mean values for each group
     mean_non_churn = df[df['Churn'] == 0][col].mean()
     mean_churn = df[df['Churn'] == 1][col].mean()
+    # Calculate percentage difference between groups
     diff_percentage = ((mean_churn - mean_non_churn) / mean_non_churn * 100) if mean_non_churn != 0 else 0
 
-    # Kiểm tra ý nghĩa thống kê
+    # Perform statistical test to determine if the difference is significant
+    # Welch's t-test (equal_var=False) is used to compare means of two independent samples
     t_stat, p_value = stats.ttest_ind(df[df['Churn'] == 0][col], df[df['Churn'] == 1][col], equal_var=False)
 
+    # Print results of the comparison
     print(f"{col}:")
-    print(f"  - Trung bình (Không rời bỏ): {mean_non_churn:.2f}")
-    print(f"  - Trung bình (Rời bỏ): {mean_churn:.2f}")
-    print(f"  - Chênh lệch: {diff_percentage:.2f}%")
-    print(f"  - p-value: {p_value:.4f} {'(Có ý nghĩa thống kê)' if p_value < 0.05 else '(Không có ý nghĩa thống kê)'}")
+    print(f"  - Mean (Non-churned): {mean_non_churn:.2f}")
+    print(f"  - Mean (Churned): {mean_churn:.2f}")
+    print(f"  - Difference: {diff_percentage:.2f}%")
+    # A p-value < 0.05 indicates statistical significance (95% confidence)
+    print(f"  - p-value: {p_value:.4f} {'(Statistically significant)' if p_value < 0.05 else '(Not statistically significant)'}")
 
-# Phân tích các biến phân loại
+# Analyze categorical variables
+# These are non-numeric features that need different analysis methods
 categorical_cols = ['State', 'International plan', 'Voice mail plan']
-print("\nPhân tích các biến phân loại:")
+print("\nAnalyzing categorical variables:")
 
+# For each categorical feature, analyze churn rates by category
 for col in categorical_cols:
     print(f"\n{col}:")
-    # Tính tỷ lệ churn cho mỗi giá trị của biến phân loại
-    churn_by_category = df.groupby(col)['Churn'].mean() * 100
-    count_by_category = df.groupby(col).size()
+    # Calculate churn rate for each category value
+    churn_by_category = df.groupby(col)['Churn'].mean() * 100  # Mean of Churn (0/1) gives proportion of churned customers
+    count_by_category = df.groupby(col).size()  # Count customers in each category
 
+    # Print churn rate for each category
     for category, churn_rate in churn_by_category.items():
         count = count_by_category[category]
-        print(f"  - {category}: {count} khách hàng, tỷ lệ rời bỏ {churn_rate:.2f}%")
+        print(f"  - {category}: {count} customers, churn rate {churn_rate:.2f}%")
 
-# Phân tích tương quan
-print("\nPhân tích tương quan với Churn:")
+# Correlation analysis
+# Measure how strongly each feature correlates with churn
+print("\nCorrelation analysis with Churn:")
+# Calculate correlation coefficients between each feature and Churn
 correlations = df[numerical_cols + ['Churn']].corr()['Churn'].sort_values(ascending=False)
-print(correlations)
+print(correlations)  # Higher absolute values indicate stronger relationships
 
-# Lưu kết quả phân tích vào file
+# Save analysis results to a text file
+# This creates a report that can be shared or referenced later
 with open('churn_analysis_results.txt', 'w') as f:
-    f.write("PHÂN TÍCH ĐẶC ĐIỂM KHÁCH HÀNG RỜI BỎ VÀ KHÔNG RỜI BỎ\n\n")
+    f.write("CUSTOMER CHURN ANALYSIS RESULTS\n\n")
 
-    f.write("1. TỔNG QUAN VỀ DỮ LIỆU\n")
-    f.write(f"Số lượng mẫu: {df.shape[0]}\n")
-    f.write(f"Số lượng thuộc tính: {df.shape[1]}\n")
-    f.write(f"Tỷ lệ khách hàng rời bỏ: {churn_percentage[1]:.2f}%\n\n")
+    # Write overview section
+    f.write("1. DATASET OVERVIEW\n")
+    f.write(f"Number of samples: {df.shape[0]}\n")
+    f.write(f"Number of features: {df.shape[1]}\n")
+    f.write(f"Churn rate: {churn_percentage[1]:.2f}%\n\n")
 
-    f.write("2. ĐẶC ĐIỂM KHÁCH HÀNG RỜI BỎ\n")
-    # Liệt kê các đặc điểm nổi bật của khách hàng rời bỏ
+    # Sections for detailed analysis
+    # These sections would be filled with specific insights from the analysis
+    f.write("2. CHARACTERISTICS OF CHURNED CUSTOMERS\n")
+    # List notable characteristics of churned customers
 
-    f.write("3. ĐẶC ĐIỂM KHÁCH HÀNG KHÔNG RỜI BỎ\n")
-    # Liệt kê các đặc điểm nổi bật của khách hàng không rời bỏ
+    f.write("3. CHARACTERISTICS OF NON-CHURNED CUSTOMERS\n")
+    # List notable characteristics of non-churned customers
 
-    f.write("4. SO SÁNH GIỮA HAI NHÓM\n")
-    # Liệt kê các khác biệt quan trọng giữa hai nhóm
+    f.write("4. COMPARISON BETWEEN GROUPS\n")
+    # List important differences between the two groups
 
-print("\nĐã lưu kết quả phân tích vào file 'churn_analysis_results.txt'")
+# Confirm that the analysis results have been saved
+print("\nAnalysis results saved to 'churn_analysis_results.txt'")

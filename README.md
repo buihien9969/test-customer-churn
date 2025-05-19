@@ -1,29 +1,70 @@
-# test-customer-churn
+# Customer Churn Analysis and Prediction
 
-Dự án phân tích churn rate của khách hàng trong lĩnh vực viễn thông.
+A project analyzing customer churn rate in the telecommunications industry.
 
-## Mô tả dự án
+## Project Description
 
-Dự án này phân tích dữ liệu khách hàng của MCI Telecommunications để xác định các yếu tố ảnh hưởng đến việc khách hàng rời bỏ dịch vụ (churn) và đề xuất các giải pháp để giảm tỷ lệ churn.
+This project analyzes customer data from MCI Telecommunications to identify factors influencing customer churn and proposes solutions to reduce the churn rate. Customer churn refers to when customers stop using a company's services.
 
-## Nội dung chính
+## Key Components
 
-- Phân tích ý nghĩa của Churn Rate
-- Phân tích đặc điểm khách hàng và mẫu sử dụng
-- So sánh các mô hình Machine Learning để dự đoán churn
-- Đề xuất các giải pháp để giảm tỷ lệ churn
+- Analysis of Churn Rate significance
+- Customer characteristics and usage pattern analysis
+- Comparison of Machine Learning models for churn prediction
+- Recommendations for reducing churn rate
 
-## Cấu trúc dự án
+## Project Structure
 
-- `analyze_churn.py`: Script phân tích dữ liệu churn
-- `churn_modeling.py`: Script xây dựng và đánh giá các mô hình ML
-- `create_all_slides.py`: Script tạo bài thuyết trình PowerPoint
-- `MCI_Churn_Analysis_Presentation_Final.pptx`: Bài thuyết trình PowerPoint
-- `MCI_Churn_Analysis_Presentation_New.md`: Nội dung bài thuyết trình dạng Markdown
+- `analyze_churn.py`: Script for analyzing churn data
+- `churn_modeling.py`: Script for building and evaluating ML models
+- `requirements.txt`: List of required Python packages
 
-## Kết quả chính
+## Installation and Setup
 
-- Tỷ lệ churn tổng thể: 14.49%
-- Các yếu tố dự đoán churn hàng đầu: Gói quốc tế, số cuộc gọi dịch vụ khách hàng, tổng số cuộc gọi quốc tế
-- Mô hình tốt nhất: XGBoost (Độ chính xác: 95.50%, F1-Score: 82.56%)
-- Đề xuất: Tối ưu hóa gói quốc tế, cải thiện dịch vụ khách hàng, chiến lược giữ chân khách hàng theo phân khúc
+1. Clone the repository:
+```
+git clone https://github.com/yourusername/test-customer-churn.git
+cd test-customer-churn
+```
+
+2. Install required packages:
+```
+pip install -r requirements.txt
+```
+
+3. Run the analysis script:
+```
+python analyze_churn.py
+```
+
+4. Run the modeling script:
+```
+python churn_modeling.py
+```
+
+## Key Results
+
+- Overall churn rate: 14.49%
+- Top churn predictors: International plan, customer service calls, total international calls
+- Best model: XGBoost (Accuracy: 95.50%, F1-Score: 82.56%)
+- Recommendations: Optimize international plans, improve customer service, implement segment-based retention strategies
+
+## Data
+
+The project uses the Telco Customer Churn dataset, which includes information about:
+- Customer demographics
+- Account information
+- Services used
+- Call details
+
+## Models Evaluated
+
+- Logistic Regression
+- Decision Tree
+- Random Forest
+- Gradient Boosting
+- XGBoost
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
